@@ -49,15 +49,23 @@ def recommend_problems(request: RecommendRequest) -> RecommendResponse:
 
 @router.post("/recommend/feedback", response_model=FeedbackResponse, status_code=status.HTTP_200_OK)
 async def get_problems_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    problems_dict = []
-    for p in request.recommended_problems:
-        problems_dict.append({
-            "id": p.id,
-            "title": p.title,
-            "difficulty": p.difficulty,
-            "tags": p.tags,
-            "url": p.url
-        })
+    try:
+        problems_dict = []
+        for p in request.recommended_problems:
+            problems_dict.append({
+                "id": p.id,
+                "title": p.title,
+                "difficulty": p.difficulty,
+                "tags": p.tags,
+                "url": p.url
+            })
 
-    raw_feedback = await generate_feedback(problems_dict, request.tag_assessments)
-    return FeedbackResponse(analyses=raw_feedback.get("analyses", []))
+        raw_feedback = await generate_feedback(problems_dict, request.tag_assessments)
+        return FeedbackResponse(analyses=raw_feedback.get("analyses", []))
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"API Error: {str(e)}"
+        )
