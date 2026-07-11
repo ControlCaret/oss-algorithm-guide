@@ -130,7 +130,12 @@ if submitted:
                             key=f"tags_pills_{problem['id']}"
                         )
                         st.write("")
-                        st.link_button("LeetCode에서 문제 해결하기", problem['url'], use_container_width=True)
+                        st.markdown(
+                            f'<a href="{problem["url"]}" target="_blank" class="leetcode-btn" id="leetcode_btn_link">'
+                            f'LeetCode에서 문제 해결하기'
+                            f'</a>',
+                            unsafe_allow_html=True
+                        )
                     
                     with st.spinner("AI 멘토가 맞춤 가이드를 구성하고 있습니다..."):
                         feedback_payload = {
@@ -144,12 +149,13 @@ if submitted:
                             if analyses:
                                 analysis = analyses[0]
                                 st.write("### AI 멘토링 가이드")
-                                with st.container(border=True):
+                                with st.chat_message("assistant", avatar="🎯"):
                                     st.markdown(f"**문제 핵심 요약**\n\n{analysis['overview']}")
                                     st.markdown("---")
                                     st.markdown(f"**멘토의 추천 사유**\n\n{analysis['reason']}")
                                     st.markdown("---")
-                                    st.markdown(f"**해결 핵심 힌트**\n\n{analysis['hint']}")
+                                    st.markdown("**해결 핵심 힌트**")
+                                    st.markdown(f'<div class="spoiler-hint" tabindex="0">{analysis["hint"]}</div>', unsafe_allow_html=True)
                             else:
                                 st.warning("AI 분석 피드백 결과를 받아오지 못했습니다.")
                         else:
