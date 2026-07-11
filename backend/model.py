@@ -1,16 +1,16 @@
 from pydantic import BaseModel
 from typing import List, Dict
-from enum import Enum
+from enum import IntEnum
 
-class PreferenceEnum(str, Enum):
-    LIKE = "like"
-    NORMAL = "normal"
-    DISLIKE = "dislike"
+class PreferenceEnum(IntEnum):
+    LIKE = 1
+    NORMAL = 0
+    DISLIKE = -1
 
-class SkillEnum(str, Enum):
-    GOOD = "good"
-    NORMAL = "normal"
-    BAD = "bad"
+class SkillEnum(IntEnum):
+    GOOD = 1
+    NORMAL = 0
+    BAD = -1
 
 
 
