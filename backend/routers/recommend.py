@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, status
-from model import RecommendRequest, RecommendResponse, ProblemResponse
+from model import RecommendRequest, RecommendResponse, ProblemResponse, FeedbackRequest, FeedbackResponse
 from problems_loader import load_problems
+from gemini_recommender import generate_feedback
 import random
 
 router = APIRouter()
 
-@router.post("/recommend", status_code=status.HTTP_200_OK)
+@router.post("/recommend", response_model=RecommendResponse, status_code=status.HTTP_200_OK)
 def recommend_problems(request: RecommendRequest) -> RecommendResponse:
     all_problems = load_problems()
     if not all_problems:
@@ -44,7 +45,19 @@ def recommend_problems(request: RecommendRequest) -> RecommendResponse:
         for item in sampled
     ]
 
-    return RecommendResponse(
-        recommended_problems=recommended,
-        ai_feedback="N/A"
-    )
+    return RecommendResponse(recommended_problems=recommended)
+
+@router.post("/recommend/feedback", response_model=FeedbackResponse, status_code=status.HTTP_200_OK)
+async def get_problems_feedback(request: FeedbackRequest) -> FeedbackResponse:
+    problems_dict = []
+    for p in request.recommended_problems:
+        problems_dict.append({
+            "id": p.id,
+            "title": p.title,
+            "difficulty": p.difficulty,
+            "tags": p.tags,
+            "url": p.url
+        })
+
+    raw_feedback = await generate_feedback(problems_dict, request.tag_assessments)
+    return FeedbackResponse(analyses=raw_feedback.get("analyses", []))

@@ -21,7 +21,7 @@ class TagAssessment(BaseModel):
 class RecommendRequest(BaseModel):
     languages: List[str]
     tag_assessments: Dict[str, TagAssessment]
-    target_count: int
+    target_count: int = 1
 
 class ProblemResponse(BaseModel):
     id: int
@@ -32,4 +32,16 @@ class ProblemResponse(BaseModel):
 
 class RecommendResponse(BaseModel):
     recommended_problems: List[ProblemResponse]
-    ai_feedback: str
+
+class ProblemAnalysis(BaseModel):
+    id: int
+    overview: str
+    reason: str
+    hint: str
+
+class FeedbackRequest(BaseModel):
+    recommended_problems: List[ProblemResponse]
+    tag_assessments: Dict[str, TagAssessment]
+
+class FeedbackResponse(BaseModel):
+    analyses: List[ProblemAnalysis]
